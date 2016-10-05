@@ -45,7 +45,7 @@ class DockerCloud extends AbstractCloud {
     }
 
     @Override
-    Container launchContainer(String browserName, String browserVersion, String name, String dns) {
+    Container launchContainer(String browserName, String browserVersion, String name, Map options) {
         final image = imagesProvider.image(browserName, browserVersion)
         if (!image) {
             throw new RuntimeException("Image for $browserName:$browserVersion not found in mapping!")
@@ -62,8 +62,8 @@ class DockerCloud extends AbstractCloud {
                 .portBindings([:])
                 .shmSize(image.shmSize)
                 .networkMode(NETWORK_MODE)
-        if (dns) {
-            hostConfig = hostConfig.dns(dns)
+        if (options.dns) {
+            hostConfig = hostConfig.dns(options.dns as String)
         }
         ContainerConfig config = builder().env(imagesProvider.env(SELF_HOST, SELF_PORT, name, exposedPort) as String[])
                 .exposedPorts("$exposedPort/tcp")
